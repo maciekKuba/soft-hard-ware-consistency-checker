@@ -12,6 +12,9 @@ Less bugs in configuration.
 It compares data of pins assignment taken from C file and netlist file from PCB project.
 
 ## Requirements
+
+Python 3.
+
 The tool supports netfiles outputted from KiCad (tested under KiCad 4).
 Also, it requires use of imposed C file format.
 
@@ -110,4 +113,5 @@ After data from C file and netlist are gathered, the script looks for pins commo
 7. Supports only '//' comment indication in C source file.
 
 ## Improvement areas
-1. Replacement of lists with maps for quicker execution of scripts.	
+1. Replacement of lists with maps for quicker execution of scripts.
+2. Parsing direct netlist file rather than indirect xml.	
