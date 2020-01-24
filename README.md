@@ -23,7 +23,7 @@ C file (does not need to be separate file) must contain pins assignments as foll
     //PIN_INIT(GPIOA, 4, xxx)
     PIN_INIT(GPIOA, 5, SPI_CK)
 
-The macro PIN_INIT() creates an object of following type:
+The macro PIN_INIT() creates an object of following type (see pin.h):
     
     typedef struct pin
     {
@@ -55,6 +55,22 @@ No worries about errors thrown there. You most likely get a sufficient netlist f
 Run comparator.py script with following arguments passed into:
 
     python comparator.py "yourMicrocontrollerRefNameInSchematic" "yourCFilename.c" "yourNetlist.xml"
+    
+You can also check how that works by running Test.bat file which uses provided exemplary data of C file and KiCad project.
+The result should be similar to this one:
+
+    Pins matching
+    Port    Index   Sch label       CCode label
+    A       12      TIMER2          TIMER2
+    
+    Pins not matching
+    Port    Index   Sch label       CCode label
+    D       2       TIMER           None
+    D       1       Net-(U1-Pad6)   TIMER
+    C       15      ADC2            None
+    A       5       Net-(R4-Pad1)   SPI1_SCK
+    C       3       ADC             adc
+    B       6       UART_TX         TX
 
 ## Operation in details
 ### C file data.
