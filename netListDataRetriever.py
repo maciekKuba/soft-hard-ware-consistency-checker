@@ -1,6 +1,9 @@
 import xml.etree.ElementTree as ET
 import re
 
+
+separator = '\t'
+
 def retrievePortPinData(rolesStr):
     match = re.search('(^|/)(P([A-Z]{1})(\d{,2}))', rolesStr)
     if match:
@@ -30,11 +33,11 @@ class CPinData:
         self.isConnected = True
 
     def printMembers(self):
-        stringToPrint = str(self.indexInPackage) + "," +\
-            str(self.portName) + "," +\
-            str(self.portIndex) + "," +\
-            str(self.roles) + "," +\
-            str(self.isConnected) + "," +\
+        stringToPrint = str(self.indexInPackage) + separator  + separator +\
+            str(self.portName) + separator +\
+            str(self.portIndex) + separator + separator +\
+            str(self.roles) + separator +\
+            str(self.isConnected) + separator +\
             str(self.netName)
         print(stringToPrint)
 
@@ -54,11 +57,11 @@ def getDataFromNetList(refName,filename):
 
     '''Getting component from a list of components'''
     components = root.findall("components/comp[@ref='" + referenceName + "']")
-    print(components)
     if not components:
         print("Not a valid referenceName")
     else:
         for comp in components:
+            print("Microcontroller data")
             print("ref: " + comp.get("ref"))
             value = comp.find("value").text
             print("value: " + value)
@@ -110,7 +113,7 @@ def getDataFromNetList(refName,filename):
     for net in netsOfThePart:    
         pinNum = net.find('node[@ref="' + referenceName + '"]').get("pin")
         netName = net.get('name')
-        match = re.search('(/){0,1}(\w+)', netName)
+        match = re.search('(/){0,1}([\w\-\(\)]+)', netName)
         netNameWOutGarbage = match.group(2)
         entryInPinList = getEntryByIndexInPack(pinsDataList, pinNum)
         entryInPinList.setNetName(netNameWOutGarbage)
@@ -119,17 +122,18 @@ def getDataFromNetList(refName,filename):
             entryInPinList.setConnection()
 
     print()
-    print("Pins having no connection")
+    print("Pins utilized in a schematic")
+    print("Index pack" + separator + "Port" + separator + "Index port" + separator + "Avail. roles" + separator + "Is connected" + separator + "Label")
     for item in pinsDataList:
-        if not item.isConnected:
+        if item.isConnected:
             item.printMembers()
 
-    print("\n\n\n")
+    print("\n")
             
     return pinsDataList
 
 if __name__ == "__main__":
-    getDataFromNetList("U1","PCB_motherboard.xml")
+    getDataFromNetList("U1","./KiCadExample/STM32F100.xml")
 
 
 
