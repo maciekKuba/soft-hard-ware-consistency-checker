@@ -60,10 +60,13 @@ Run comparator.py script with following arguments passed into:
     python comparator.py "yourMicrocontrollerRefNameInSchematic" "yourCFilename.c" "yourNetlist.xml"
     
 You can also check how that works by running Test.bat file which uses provided exemplary data of C file and KiCad project.
+
 The code view:
+
 ![Alt text](docs/CCodeScreenshot.png?raw=true "Title")
 
 The schematic view:
+
 ![Alt text](docs/KiCadScreenshot.png?raw=true "Title")
 
 The result should be similar to this one:
