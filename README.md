@@ -1,32 +1,33 @@
 # soft-hard-ware-consistency-checker
-Software and Hardware Consistency Checker
+Tool that checks mapping of microcontroller's pins between software and schematic
 
 ## Goal
-The script performs consistency check of microcontroller's pins assignment between software and PCB projects.
+The script performs consistency check of microcontroller's pins labels between software and PCB projects.
 Less eye checks. 
-Less forgotten changes and cut-and-bypassed lines on just etched new PCB a while ago. 
+Less forgotten changes. 
 Less hacky solders.
 Less bugs in configuration.
 
-### General operation
-It compares data of pins assignment taken from C file and netlist file from PCB project.
+### Operation in general
+It compares pin label taken from C file with name of the net to which the pin is connected in the circuit project.
+Name of net is treated as pins label in the circuit design.
 
 ## Requirements
 
 Python 3.
 
-The tool supports netfiles outputted from KiCad (tested under KiCad 4).
-Also, it requires use of imposed C file format.
+The tool supports netlist files outputted from KiCad (tested under KiCad 4).
+Moreover, it requires use of imposed C file format in the software.
 
 ### C file format
 There are required 2 files - a source and a header.
-For header, please look into repository. Just copy and paste into your project's sources/headers directory.
-C file (does not need to be separate file) must contain pins assignments as follows:
+Header is ready to copy and paste from under /utils directory.
+C file must contain labels assignments as follows:
 
     //PIN_INIT(GPIOA, 4, xxx)
     PIN_INIT(GPIOA, 5, SPI_CK)
 
-The macro PIN_INIT() creates an object of following type (see pin.h):
+The macro PIN_INIT() creates a structure of following type (see pin.h):
     
     typedef struct pin
     {
@@ -34,18 +35,18 @@ The macro PIN_INIT() creates an object of following type (see pin.h):
     	uint16_t GPIO_PinNr;
     } PIN_S;
 
-You should use such created objects in your code to configure pins.
+Use such created structures in your code to configure pins.
 
-Commented line means unassigned pin.
+Commented lines are treated as unassigned.
 The macro PIN_INIT() takes following arguments:
-	port, index in the port, function name.
+	port, index in the port, label text.
 
-In case of keeping the assignment in separate file, ensure you use PIN_EXTERN() macro in files where you use the pin structure object.
+While assignments are stored in separate file, ensure you use PIN_EXTERN() macro in files where you are going to use structures.
 
 ### Schematic
-In the schematic assign all used pins a label.
-The label should match the function name in a C code file.
-Otherwise, the script will catch the mismatch to warn you.
+In the schematic assign all wires connected to microcontroller's pins a label.
+Label's text should be the same as in C code.
+Otherwise, the script will catch the mismatch and throw it to warn you.
 
 ## How to use?
 Run xsltproc.exe in KiCad for getting intermediate netlist file in XML format:
@@ -53,13 +54,13 @@ Run xsltproc.exe in KiCad for getting intermediate netlist file in XML format:
     "C:/Program Files/KiCad/bin/xsltproc.exe" "%I" "--nowrite"
 
 You can run it from the BOM section in KiCad EESCHEMA.
-No worries about errors thrown there. You most likely get a sufficient netlist file.
+No worries about errors thrown there. You most likely get a sufficient netlist file anyway.
   
-Run comparator.py script with following arguments passed into:
+Run comparator.py script with following arguments passed into it:
 
     python comparator.py "yourMicrocontrollerRefNameInSchematic" "yourCFilename.c" "yourNetlist.xml"
     
-You can also check how that works by running Test.bat file which uses provided exemplary data of C file and KiCad project.
+You can also check how that works by running Test.bat file which uses provided exemplary data from C file and KiCad project.
 
 The code view:
 
@@ -86,7 +87,7 @@ The result should be similar to this one:
 
 ## Operation in details
 ### C file data.
-Gathering pin data from C code file contaning function (role) assigned to pins.
+Gathering pin data from C code file contaning function (role, label) assigned to pins.
 Retrieved data for each pin: 
 
 * port name,
@@ -108,8 +109,7 @@ The script utilizes *xml* python module to retrieve the data.
 Netlist data are used as a reference to C file data.
 
 ### Comparison
-
-After data from C file and netlist are gathered, the script looks for pins commonly used in both files and selects those having differece between net-name in netlist and function name in C file. Data regarding to selected pins is printed out.
+After data from C file and netlist are gathered, the script looks for pins commonly used in both files and selects those having difference between net-name in netlist and function name in C file. Data regarding to selected pins is printed out.
 
 ## Limitations 
 (in spite of known limitations or any uknown yet, please notify me if you see some would be nice to be supported already)
